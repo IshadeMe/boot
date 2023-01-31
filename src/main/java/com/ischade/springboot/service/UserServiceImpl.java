@@ -1,50 +1,51 @@
 package com.ischade.springboot.service;
 
-import com.ischade.springboot.dao.Dao;
+import com.ischade.springboot.dao.UserRepository;
 import com.ischade.springboot.model.User;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    final Dao<User, Integer> userDao;
+    final UserRepository userRepository;
 
-    public UserServiceImpl(Dao<User, Integer> userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userDao.getAll();
+        return userRepository.findAll();
     }
 
     @Override
     public User getUserById(int id) {
-        return userDao.getById(id);
+        User user = null;
+        Optional<User> opt = userRepository.findById(id);
+        if (opt.isPresent()) {
+            user = opt.get();
+        }
+        return user;
     }
 
     @Override
-    @Transactional
     public void addUser(User user) {
-        userDao.add(user);
+        userRepository.save(user);
     }
 
     @Override
-    @Transactional
     public void deleteUserById(int id) {
-        userDao.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     @Override
-    @Transactional
     public void updateUser(User user) {
-        userDao.update(user);
+        userRepository.save(user);
     }
 }
